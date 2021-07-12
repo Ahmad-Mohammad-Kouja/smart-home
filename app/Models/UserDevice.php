@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class UserDevice extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $table = 'user_devices';
 
@@ -20,17 +22,6 @@ class UserDevice extends Model
         'schedule' => AsCollection::class,
     ];
 
-    public function scopeUserDevice($query,$userId,$deviceId)
-    {
-        return $query->where('user_id',$userId)
-                    ->where('device_id',$deviceId);
-    }
-
-    public function scopeUserDevices($query,$userId,$devicesIds)
-    {
-        return $query->where('user_id',$userId)
-                    ->whereIn('device_id',$devicesIds);
-    }
 
     public function scopeActive($query)
     {
@@ -38,32 +29,40 @@ class UserDevice extends Model
     }
 
 
-    public function turnOnUserDevice($deviceId,$userId)
+    public function turnOnUserDevice($deviceId)
     {
-        return $this->userDevice($userId,$deviceId)
-            ->available()
+        return $this->where('id',$deviceId)
+            ->active()
             ->update(['current_state' => 1]);
     }
 
-    public function turnOffUserDevice($deviceId,$userId)
+    public function turnOffUserDevice($deviceId)
     {
-        return $this->userDevice($userId,$deviceId)
-            ->available()
+        return $this->where('id',$deviceId)
+            ->active()
             ->update(['current_state' => 0]);
     }
 
 
-    public function turnOnUserDevices($devicesIds,$userId)
+    public function turnOnUserDevices($userDevicesIds)
     {
-        return $this->userDevices($userId,$devicesIds)
-            ->available()
+        return $this->whereIn('id',$userDevicesIds)
+            ->active()
             ->update(['current_state' => 1]);
     }
 
-    public function turnOffUserDevices($devicesIds,$userId)
+    public function turnOffUserDevices($userDevicesIds)
     {
-        return $this->userDevices($userId,$devicesIds)
-            ->available()
+        return $this->whereIn('id',$userDevicesIds)
+            ->active()
             ->update(['current_state' => 0]);
+    }
+
+    public function userDeviceSubQuery()
+    {
+        return DB::table('user_devices')
+                   ->where('is_active', true)
+                   ->whereNull('deleted_at')
+                   ->select('id as user_device_id','user_id','schedule','current_state');
     }
 }

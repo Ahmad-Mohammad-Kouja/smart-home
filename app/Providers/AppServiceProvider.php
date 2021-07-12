@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use stdClass;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Arr::macro('groupBy',function($array,$key)
+        {
+            $grouppedData = array();
+            foreach($array as $data)
+                $grouppedData[$data->{$key}][] = $data;
+
+            return $grouppedData;
+        });
     }
 }

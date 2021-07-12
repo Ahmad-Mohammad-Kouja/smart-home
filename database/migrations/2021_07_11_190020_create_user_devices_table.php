@@ -18,6 +18,7 @@ class CreateUserDevicesTable extends Migration
             $table->json('schedule');
             $table->boolean('current_state')->default(0);
             $table->boolean('is_active')->default(1);
+            $table->string('sku',50)->unique();
             $table->foreignId('user_id');
             $table->foreignId('device_id');
             $table->timestamps();
