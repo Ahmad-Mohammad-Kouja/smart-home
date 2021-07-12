@@ -17,7 +17,6 @@ class CreateDevicesTable extends Migration
             $table->id();
             $table->string('name',50);
             $table->string('description',512);
-            $table->string('sku',50)->unique();
             $table->json('default_schedule');
             $table->boolean('is_available')->default(1);
             $table->timestamps();
