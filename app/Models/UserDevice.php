@@ -28,22 +28,6 @@ class UserDevice extends Model
         return $query->where('is_active',1);
     }
 
-
-    public function turnOnUserDevice($deviceId)
-    {
-        return $this->where('id',$deviceId)
-            ->active()
-            ->update(['current_state' => 1]);
-    }
-
-    public function turnOffUserDevice($deviceId)
-    {
-        return $this->where('id',$deviceId)
-            ->active()
-            ->update(['current_state' => 0]);
-    }
-
-
     public function turnOnUserDevices($userDevicesIds)
     {
         return $this->whereIn('id',$userDevicesIds)
@@ -58,11 +42,4 @@ class UserDevice extends Model
             ->update(['current_state' => 0]);
     }
 
-    public function userDeviceSubQuery()
-    {
-        return DB::table('user_devices')
-                   ->where('is_active', true)
-                   ->whereNull('deleted_at')
-                   ->select('id as user_device_id','user_id','schedule','current_state');
-    }
 }
